@@ -1,0 +1,21 @@
+{
+  "name": "example-event-subscriber",
+  "version": "1.0.0",
+  "description": "Example CloudEvents subscriber",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "@azure/functions": "^4.1.0"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.x",
+    "@types/node": "20.x",
+    "typescript": "^5.0.4"
+  }
+}
