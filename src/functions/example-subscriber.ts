@@ -5,11 +5,17 @@ import {
   InvocationContext,
   output,
 } from "@azure/functions";
+import { JwksClient } from "jwks-rsa";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const initEventTypeNotation = "no.bankid.bass.audit.reissue.init.v1";
 const successEventTypeNotation = "no.bankid.bass.audit.reissue.completed.v1";
 
 const known_webhook_sender = "eventgrid.azure.net";
+
+const jwkClient = new JwksClient({
+  jwksUri: `https://login.microsoftonline.com/${process.env.REMOTE_TENANT_ID}/discovery/v2.0/keys`,
+});
 
 type InitEvent = {
   sessionId: string;
@@ -47,9 +53,33 @@ export async function exampleSubscriber(
   context.trace("method", request.method);
   context.trace("headers ", request.headers);
 
-  // Please note that you should do more validation than this in a real world scenario
-  if (request.headers.get("authorization") == null) {
+  const token = request.headers.get("authorization").split(" ")[1];
+  if (token == null) {
     context.warn("Missing authorization header");
+    return { status: 403, body: "No access" };
+  }
+
+  try {
+    const decodedToken = jwt.decode(token, { complete: true });
+    const jwk = await jwkClient.getSigningKey(decodedToken.header.kid);
+
+    const decodedJwt = jwt.verify(token, jwk.getPublicKey(), {
+      audience: process.env.RECEIVER_ID, // ID specific to the receiver
+      issuer: `https://login.microsoftonline.com/${process.env.REMOTE_TENANT_ID}/v2.0`,
+      subject: process.env.SENDER_ID, // Bidbax specific
+    }) as JwtPayload;
+    if (
+      !decodedJwt["roles"] ||
+      !decodedJwt["roles"].includes("AzureEventGridSecureWebhookSubscriber")
+    ) {
+      context.warn("Missing required role");
+      return { status: 403, body: "No access" };
+    }
+    // azp and oid are also available in the decodedJwt object for validation.
+    // Like the sub claim, they refer to the calling application.
+    // oid is the same value as the subject, while azp is a different id.
+  } catch (error) {
+    context.warn("Invalid token", error);
     return { status: 403, body: "No access" };
   }
 
