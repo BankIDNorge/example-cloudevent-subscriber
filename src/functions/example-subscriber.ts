@@ -40,7 +40,7 @@ type CloudEvent = {
 
 export async function exampleSubscriber(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
@@ -94,7 +94,7 @@ export async function exampleSubscriber(
 
 function validateCloudEventSubscription(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): HttpResponseInit {
   const webhookRequestOrigin = request.headers.get("webhook-request-origin");
 
@@ -103,7 +103,7 @@ function validateCloudEventSubscription(
     webhookRequestOrigin != known_webhook_sender
   ) {
     context.log(
-      "Invalid webhook-request-origin header value: " + webhookRequestOrigin
+      "Invalid webhook-request-origin header value: " + webhookRequestOrigin,
     );
     return { status: 500, body: "Invalid request" };
   }
