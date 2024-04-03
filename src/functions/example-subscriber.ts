@@ -47,16 +47,6 @@ export async function exampleSubscriber(
   context.trace("method", request.method);
   context.trace("headers ", request.headers);
 
-  if (
-    !request.headers
-      .get("content-type")
-      .includes("application/cloudevents+json")
-  ) {
-    context.warn("Invalid content-type header");
-    context.trace(`content-type: ${request.headers.get("content-type")}`);
-    return { status: 500, body: "Invalid request" };
-  }
-
   // Please note that you should do more validation than this in a real world scenario
   if (request.headers.get("authorization") == null) {
     context.warn("Missing authorization header");
@@ -67,7 +57,18 @@ export async function exampleSubscriber(
     return validateCloudEventSubscription(request, context);
   }
 
+  if (
+    !request.headers
+      .get("content-type")
+      .includes("application/cloudevents+json")
+  ) {
+    context.warn("Invalid content-type header");
+    context.trace(`content-type: ${request.headers.get("content-type")}`);
+    return { status: 500, body: "Invalid request" };
+  }
+
   if (request.body == null) {
+    context.warn("Missing request body");
     return { status: 500, body: "Invalid request" };
   }
 

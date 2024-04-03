@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "Example CloudEvents subscriber",
   "main": "dist/src/functions/*.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "prestart": "npm run build",
+    "clean": "rimraf dist",
+    "prestart": "npm run clean && npm run build",
     "start": "func start",
     "test": "echo \"No tests yet...\""
   },
@@ -17,6 +19,7 @@
     "@types/node": "20.x",
     "azure-functions-core-tools": "^4.x",
     "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }
 }
