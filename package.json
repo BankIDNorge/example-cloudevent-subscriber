@@ -17,6 +17,6 @@
     "@types/node": "20.x",
     "azure-functions-core-tools": "^4.x",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.3"
   }
 }
