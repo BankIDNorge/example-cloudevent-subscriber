@@ -21,7 +21,7 @@
     "@types/node": "20.x",
     "azure-functions-core-tools": "^4.x",
     "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.7",
     "typescript": "^5.3.3"
   }
 }
